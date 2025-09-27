@@ -1,0 +1,106 @@
+############################
+# macOS
+############################
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.fseventsd
+
+############################
+# Python
+############################
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-wheel-metadata/
+*.manifest
+*.spec
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+htmlcov/
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+############################
+# Node.js / JavaScript
+############################
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.pnp/
+.pnp.js
+.next/
+.nuxt/
+out/
+dist/
+build/
+
+############################
+# Logs
+############################
+logs
+*.log
+pnpm-debug.log*
+
+############################
+# VSCode
+############################
+.vscode/*
+.history/
+
+############################
+# JetBrains IDEs
+############################
+.idea/
+*.iml
+*.iws
+*.ipr
+
+############################
+# Others
+############################
+.sass-cache/
+.npm/
+.eslintcache
+.stylelintcache
+*.tmp
+*.swp

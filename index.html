@@ -1,21 +1,1258 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="auto">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Profile</title>
-  </head>
-
-  <body>
-    <p>Example Text</p>
-
-    <h1>Wow a dog</h1>
-
-    <img
-      src="https://upload.wikimedia.org/wikipedia/commons/4/48/Silly_Dog_%282277051513%29.jpg"
-      alt="A silly looking dog."
-      width="400px"
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hyeonahyeah</title>
+    <meta
+      name="description"
+      content="Clean & simple portfolio with scroll-snap, automation micro-interactions, and accessible semantics."
     />
+    <style>
+      /* ------------------
+               Design tokens
+            ------------------ */
+      :root {
+        --bg: #ffffff;
+        --text: #0b0f10;
+        --muted: #667085;
+        --brand: #2e7dff;
+        --brand-2: #00c2a8; /* accent for subtle highlights */
+        --card: #f5f7fb;
+        --ring: rgba(46, 125, 255, 0.35);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b0f10;
+          --text: #f1f5f9;
+          --muted: #8b98a5;
+          --brand: #a590e8;
+          --brand-2: #e57373;
+          --card: #12171c;
+          --ring: rgba(106, 164, 255, 0.45);
+        }
+      }
+      [data-theme="dark"] {
+        --bg: #0b0f10;
+        --text: #f1f5f9;
+        --muted: #8b98a5;
+        --brand: #6aa4ff;
+        --brand-2: #32e2ca;
+        --card: #12171c;
+        --ring: rgba(106, 164, 255, 0.45);
+      }
+
+      /* ------------------
+               Base styles
+            ------------------ */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Noto Sans, "Apple SD Gothic Neo", "Pretendard", Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--text);
+        background: var(--bg);
+      }
+      a {
+        color: var(--brand);
+        text-decoration: none;
+      }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 3px solid var(--ring);
+        outline-offset: 2px;
+        border-radius: 10px;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 1px, 1px);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      /* ------------------
+               Layout: Scroll Snap
+            ------------------ */
+      .snap-container {
+        height: 100vh; /* Full viewport */
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory; /* key line */
+        scroll-behavior: smooth;
+      }
+      section.panel {
+        position: relative;
+        min-height: 100vh; /* Each panel fills screen */
+        padding: clamp(20px, 4vw, 56px);
+        display: grid;
+        place-items: center;
+        scroll-snap-align: start; /* locks to top */
+        background: var(--bg);
+      }
+      .panel-inner {
+        width: min(1100px, 92vw);
+        display: grid;
+        gap: clamp(16px, 3vw, 28px);
+      }
+      .center {
+        text-align: center;
+      }
+
+      /* Quick fly-up when leaving (the “슉!”) */
+      @keyframes flyUp {
+        from {
+          filter: none;
+          transform: translateY(0);
+          opacity: 1;
+        }
+        to {
+          filter: blur(4px);
+          transform: translateY(-14%);
+          opacity: 0.15;
+        }
+      }
+      .panel.leaving .panel-inner {
+        animation: flyUp 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+
+      /* ------------------
+               Top utility bar
+            ------------------ */
+      .topbar {
+        position: fixed;
+        inset: 12px 12px auto auto;
+        z-index: 50;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .btn {
+        display: inline-block;
+        text-align: center;
+        text-decoration: none; /* 밑줄 제거 */
+        box-sizing: border-box; /* a와 button의 padding 계산 방식 통일 */
+        line-height: 1; /* 버튼과 동일하게 */
+        background: var(--card);
+        font-size: 0.9rem;
+        color: var(--text);
+        border: 1px solid color-mix(in oklab, var(--text) 18%, transparent);
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        filter: brightness(1.5);
+      }
+      .btn:active {
+        /* filter: brightness(0.7); */
+        transform: scale(0.96); /* 살짝 눌린 듯 */
+      }
+      .btn:focus {
+        filter: brightness(1.5);
+      }
+
+      /* ------------------
+               HERO
+            ------------------ */
+      .hero {
+        display: grid;
+        gap: 24px;
+        align-items: center;
+        justify-items: center;
+        position: relative;
+      }
+      .avatar {
+        flex: 0 0 auto;
+        align-self: center;
+        width: clamp(20px, 24vw, 260px);
+        aspect-ratio: 1/1;
+        border-radius: 28px; /* soft rounded, not perfect circle to avoid “각진 네모” 느낌 */
+        object-fit: cover;
+        object-position: center 20%;
+        box-shadow: 0 10px 40px var(--brand);
+        background-color: var(--brand);
+      }
+      /* place chat to the right of the centered avatar with an explicit gap */
+      .hero-chat {
+        position: absolute;
+        top: 0;
+        left: 85%;
+        transform: none;
+        transition: width 0.35s ease;
+        box-sizing: border-box;
+      }
+
+      /* Desktop */
+      @media (min-width: 861px) {
+        .hero-chat {
+          width: 130px; /* smaller bubble to start with */
+        }
+        .hero-chat.expanded {
+          width: clamp(260px, 28vw, 500px); /* expand on interaction */
+        }
+      }
+
+      /* Mobile */
+      @media (max-width: 860px) {
+        .hero-chat {
+          position: static;
+          width: 100%; /* full width of desktop*/
+          transform: none;
+          left: auto;
+          margin-top: clamp(20px, 4vw, 40px);
+        }
+        .hero-chat.expanded {
+          width: 100%;
+        }
+      }
+
+      .headline {
+        font-size: clamp(28px, 7vw, 64px);
+        line-height: 1.05;
+        margin: 0;
+        letter-spacing: -0.02em;
+        font-weight: 800;
+      }
+      .kicker {
+        color: var(--muted);
+        font-size: clamp(12px, 2.6vw, 16px);
+        letter-spacing: 0.25px;
+      }
+      .big-kw {
+        font-size: clamp(18px, 4.5vw, 28px);
+        font-weight: 700;
+        background: linear-gradient(90deg, var(--brand), var(--brand-2));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        min-height: 1.2em;
+      }
+      .cta-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .cta-primary {
+        background: var(--brand);
+        color: var(--bg);
+        border: none;
+      }
+      .cta-primary:hover {
+        filter: brightness(1.08);
+      }
+
+      /* ------------------
+               BIO / PROJECTS / CONTACT panels
+            ------------------ */
+      .card {
+        background: var(--card);
+        border: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
+        padding: clamp(16px, 3.5vw, 28px);
+        border-radius: 18px;
+      }
+
+      /* Layout */
+
+      .grid-2 {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: 1fr; /* 모바일: 1열 */
+        max-width: 1100px; /* 중앙에 모이도록 */
+        margin: 0 auto;
+      }
+      @media (min-width: 860px) {
+        .grid-2 {
+          grid-template-columns: 1.2fr 0.8fr; /* 데스크탑: 2열 */
+          align-items: start; /* Tech Stack가 About 섹션 타이틀에 맞춰 위로 */
+        }
+      }
+
+      /* Section Title */
+      .section-title {
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+
+      .about-card {
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Card Title (소제목) */
+      .card-title {
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      /* About 슬라이드 */
+      .about-slide {
+        display: none;
+      }
+      .about-slide.active {
+        display: block;
+      }
+
+      .about-nav {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+      }
+      .about-nav button {
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 2px solid var(--brand);
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+      }
+      .about-nav button:hover {
+        /* background: #666; */
+      }
+
+      /* Tech Stack */
+      .techstack ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .techstack li {
+        margin: 6px 0;
+      }
+      .list-clean {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+      .projects a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: var(--card);
+        border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+      }
+      .projects a:hover {
+        filter: brightness(1.35);
+      }
+      .projects a:active {
+        transform: scale(0.98); /* 살짝 눌린 듯 */
+      }
+      /* Connect */
+      .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 24px; /* 아이콘 사이 간격 */
+        flex-wrap: wrap;
+      }
+      .socials-icon {
+        width: 36px;
+        height: 36px;
+        filter: grayscale(1) brightness(0.8);
+        transition: filter 0.25s ease, transform 0.25s ease;
+        cursor: pointer;
+      }
+      .socials-icon.linkedin {
+        filter: invert(50%) sepia(0%) saturate(0%) hue-rotate(93deg)
+          brightness(103%) contrast(103%);
+      }
+      .socials-icon:hover {
+        filter: none; /* 원래 색상 복원 */
+        transform: scale(1.1); /* 살짝 확대 */
+      }
+      .socials-icon.linkedin:hover {
+        filter: invert(37%) sepia(91%) saturate(7472%) hue-rotate(186deg)
+          brightness(91%) contrast(101%);
+      }
+      /* ------------------
+            Dot nav (section nav)
+            ------------------ */
+      .dots {
+        position: fixed;
+        right: 18px;
+        top: 50%;
+        translate: 0 -50%;
+        display: grid;
+        gap: 10px;
+        z-index: 40;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: color-mix(in oklab, var(--text) 30%, transparent);
+        border: 2px solid transparent;
+        cursor: pointer;
+      }
+      .dot[aria-current="true"] {
+        background: var(--brand);
+        border-color: color-mix(in oklab, var(--bg) 60%, transparent);
+      }
+      /* 👈 햄버거 버튼 기본 숨김 */
+      .hamburger {
+        display: none;
+        padding: 6px 10px;
+      }
+      .hamburger svg {
+        width: 24px;
+        height: 24px;
+        stroke: var(--text); /* 선 색 */
+        stroke-width: 2; /* 선 굵기 */
+        display: block;
+      }
+      /* 👈 모바일 메뉴 */
+      .mobile-menu {
+        display: none;
+        position: fixed;
+        top: 60px;
+        right: 16px;
+        background: var(--card);
+        border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+        border-radius: 12px;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        z-index: 70;
+      }
+      .mobile-menu.show {
+        display: flex;
+      }
+      .mobile-menu a {
+        color: var(--text);
+        text-decoration: none;
+      }
+      .mobile-menu a:hover {
+        color: var(--brand);
+      }
+
+      /* 👈 미디어쿼리: 모바일일 때 dots 숨기고 햄버거 표시 */
+      @media (max-width: 860px) {
+        .dots {
+          display: none;
+        }
+        .hamburger {
+          display: block;
+        }
+        .contact {
+          display: none;
+        }
+      }
+      /* ------------------
+               Small helpers
+            ------------------ */
+      .muted {
+        color: var(--muted);
+      }
+
+      /* ------------------
+               Chat bubble flow
+            ------------------ */
+      .chat-shell {
+        margin-top: clamp(20px, 4vw, 40px);
+        padding: clamp(16px, 3vw, 24px);
+        border-radius: 20px;
+        background: var(--card);
+        border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+        box-shadow: 0 18px 40px color-mix(in oklab, var(--text) 6%, transparent);
+        display: grid;
+        gap: clamp(14px, 2.5vw, 22px);
+      }
+      .chat-title {
+        margin: 0;
+        font-weight: 700;
+        font-size: clamp(18px, 3.6vw, 24px);
+        text-align: center;
+      }
+      .chat-flow {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .bubble {
+        position: relative;
+        background: var(--bg);
+        color: inherit;
+        border-radius: 18px;
+        padding: 14px 18px;
+        max-width: 580px;
+        border: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
+        box-shadow: 0 12px 32px color-mix(in oklab, var(--text) 8%, transparent);
+        transition: transform 240ms ease, opacity 240ms ease,
+          box-shadow 240ms ease;
+        opacity: 0;
+        transform: translateY(10px);
+        line-height: 1.6;
+      }
+      .bubble::after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 24px;
+        width: 16px;
+        height: 16px;
+        background: inherit;
+        /* border-left: 1px solid color-mix(in oklab, var(--text) 14%, transparent); */
+        border-bottom: 1px solid
+          color-mix(in oklab, var(--text) 14%, transparent);
+        transform: rotate(45deg);
+        /* border-radius: 0 0 4px 0; */
+      }
+      .bubble-enter {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .bubble button,
+      .bubble input,
+      .bubble select,
+      .bubble textarea {
+        font: inherit;
+        color: inherit;
+      }
+      .bubble.bubble-action {
+        cursor: pointer;
+        text-align: left;
+      }
+      .bubble.bubble-action:focus-visible {
+        outline: 3px solid var(--ring);
+        outline-offset: 4px;
+      }
+      .bubble-shake {
+        animation: bubbleShake 800ms ease-in-out infinite;
+      }
+      @keyframes bubbleShake {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0.3deg);
+        }
+        20% {
+          transform: translateY(-1px) rotate(-1deg);
+        }
+        40% {
+          transform: translateY(1px) rotate(1deg);
+        }
+        60% {
+          transform: translateY(-1px) rotate(-0.6deg);
+        }
+        80% {
+          transform: translateY(1px) rotate(0.6deg);
+        }
+      }
+      .chat-form {
+        display: grid;
+        gap: 12px;
+      }
+      .chat-question {
+        margin: 0;
+        font-weight: 600;
+      }
+      .chat-template {
+        /* margin: 5; */
+        line-height: 1.6;
+      }
+      .inline-input,
+      .inline-number,
+      .inline-select {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        line-height: 1.2;
+        vertical-align: middle;
+        border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
+        border-radius: 10px;
+        background: color-mix(in oklab, var(--bg) 88%, white 12%);
+        margin-inline: 6px;
+      }
+      .inline-number {
+        width: 90px;
+      }
+      .inline-select {
+        margin-left: 6px;
+      }
+      .chat-submit {
+        justify-self: start;
+        background: var(--brand);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 18px;
+        cursor: pointer;
+        transition: filter 160ms ease;
+        line-height: 1.3;
+      }
+      .chat-submit:hover {
+        filter: brightness(1.08);
+      }
+      .chat-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .bubble-quiet {
+        background: color-mix(in oklab, var(--card) 80%, var(--bg) 20%);
+      }
+      .bubble-quiet::after {
+        background: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Utility buttons: Theme toggle + Skip to content -->
+    <div class="topbar" role="region" aria-label="Utilities">
+      <a class="btn contact" href="#connect" title="Contact">Contact</a>
+      <button class="btn hamburger" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M3 6h18M3 12h18M3 18h18" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Dot navigation -->
+    <nav class="dots" aria-label="Section navigation">
+      <button
+        class="dot"
+        data-target="#hero"
+        aria-label="Go to Home"
+        aria-current="true"
+      ></button>
+      <button class="dot" data-target="#bio" aria-label="Go to Bio"></button>
+      <button
+        class="dot"
+        data-target="#projects"
+        aria-label="Go to Projects"
+      ></button>
+      <button
+        class="dot"
+        data-target="#connect"
+        aria-label="Go to Connect"
+      ></button>
+    </nav>
+
+    <!-- 👈 모바일 메뉴 -->
+    <div class="mobile-menu">
+      <a href="#hero" data-target="#hero">Home</a>
+      <a href="#bio" data-target="#bio">Bio</a>
+      <a href="#projects" data-target="#projects">Projects</a>
+      <a href="#connect" data-target="#connect">Connect</a>
+    </div>
+
+    <main class="snap-container" id="container">
+      <!-- Panel 1: HERO (name + big photo + animated keywords) -->
+      <section class="panel" id="hero" aria-labelledby="hero-h">
+        <div class="panel-inner hero">
+          <img
+            src="./img/profile_effect.png"
+            alt="Profile picture"
+            class="avatar"
+          />
+          <div>
+            <div
+              class="hero-chat"
+              class="chat-shell"
+              aria-live="polite"
+              aria-label="Automation brainstorming assistant"
+            >
+              <div class="chat-flow" id="automationFlow">
+                <button
+                  type="button"
+                  class="bubble bubble-action bubble-shake bubble-enter"
+                  id="introBubble"
+                >
+                  Hey there! 👋
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="kicker">Happy & Curious</p>
+          <h1 class="headline" id="hero-h">Hyeonah Cho</h1>
+          <div class="big-kw" aria-live="polite"><span id="typed"></span></div>
+          <div class="cta-row" role="group" aria-label="Primary actions">
+            <a class="btn" href="#bio">Go to Bio</a>
+            <a class="btn cta-primary" href="#projects">See Projects</a>
+            <!-- <button class="btn" id="randomQ">Ask me a question</button> -->
+          </div>
+          <!-- <p class="muted">
+            Full Stack Developer · Automation · Mobile · Web · JavaScript ·
+            Python
+          </p> -->
+        </div>
+      </section>
+
+      <!-- Panel 2: BIO (≥100 words) -->
+      <section class="panel" id="bio" aria-labelledby="bio-h">
+        <div id="bio" class="grid-2">
+          <!-- Left: About -->
+          <div class="about">
+            <h2 class="section-title">Get to know me!</h2>
+            <div class="card about-card">
+              <div class="about-slider">
+                <div class="about-slide active">
+                  <h3 class="card-title">I am..</h3>
+                  <p>
+                    An <strong>ICT professional</strong> and emerging
+                    <strong>software developer</strong> based in Brisbane.<br />
+                    I enjoy designing systems that make work simpler, automate
+                    repetitive tasks, and help teams become measurably more
+                    effective.
+                  </p>
+                </div>
+                <div class="about-slide">
+                  <h3 class="card-title">Professional background</h3>
+                  <p>
+                    As an <strong>ICT Officer</strong>, I’ve supported hybrid
+                    environments, solved technical issues at scale, and scripted
+                    tools and manual process that saved hours for colleagues.
+                  </p>
+                  <p>
+                    As a <strong>Junior Developer</strong>, I’ve contributed to
+                    clean and consistent user interfaces and maintainable
+                    codebases, gaining hands-on experience with both frontend
+                    and backend.
+                  </p>
+                </div>
+                <div class="about-slide">
+                  <h3 class="card-title">Mindset</h3>
+                  <p>
+                    I’m deeply <strong>curious</strong> about how things work. I
+                    ask questions not to complicate, but to understand
+                    fundamentals, because understanding at the root leads to
+                    simpler, but <strong>sustainable solutions</strong>.
+                  </p>
+                </div>
+                <div class="about-slide">
+                  <h3 class="card-title">Human side</h3>
+                  <p>
+                    Before IT, I worked as a psychological counsellor, which
+                    taught me the importance of deep and meaningful human
+                    connection. That perspective continues to inspire me to
+                    create applications that bring people closer together.
+                  </p>
+                  <p>
+                    Outside work, I enjoy exploring ideas and ways to make
+                    everyday tools feel almost magical through small
+                    automations.<br />
+                    I also enjoy squash, frisbee, indoor climbing and hiking,
+                    but what makes me happiest is reading in a quiet park, under
+                    warm sunlight with birdsong around me.
+                  </p>
+                </div>
+                <div class="about-slide">
+                  <h3 class="card-title">Motto</h3>
+                  <p>
+                    "I didn't get there by wishing for it or hoping for it, but
+                    by working for it."<br />
+                    – Estée Lauder
+                  </p>
+                  <p>
+                    If you value clarity, ownership, and Persistence, you’ll
+                    find I work the same way.
+                  </p>
+                </div>
+              </div>
+              <div class="about-nav">
+                <button id="prevAbout"><</button>
+                <button id="nextAbout">></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Tech Stack -->
+          <div class="card techstack">
+            <h3 class="card-title">Tech Stack</h3>
+            <ul>
+              <li>
+                💻 <strong>Languages</strong><br />
+                · HTML/CSS, JavaScript, PHP, Python, Java, SQL
+              </li>
+              <li>
+                🧩 <strong>Frameworks</strong><br />
+                · React, React Native, Vue 3, Laravel, Django
+              </li>
+              <li>
+                🗄️ <strong>Databases</strong><br />
+                · MySQL, SQLLite, MongoDB, R studio, Tableau
+              </li>
+              <li>
+                🛠️ <strong>Tools & Platforms</strong><br />
+                · Git & GitHub, Azure (AD & DevOps), Intune, Jira, Figma
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 3: PROJECTS (links out; satisfies external links req) -->
+      <section class="panel" id="projects" aria-labelledby="projects-h">
+        <div class="panel-inner">
+          <h2 id="projects-h" class="center">Projects</h2>
+          <div class="projects" aria-describedby="proj-help">
+            <ul class="list-clean">
+              <li>
+                <a
+                  href="https://github.com/Hyeonahyeah/Hyeonahyeah.github.io"
+                  target="_blank"
+                  rel="noopener"
+                  >Portfolio (this site) → GitHub</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="showComingSoon(event)" rel="noopener"
+                  >Web Applications → GitHub</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="showComingSoon(event)" rel="noopener"
+                  >Mobile Applications → GitHub</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="showComingSoon(event)" rel="noopener"
+                  >Desktop Applications → GitHub</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 4: CONNECT (preferred method + social) -->
+      <section class="panel" id="connect" aria-labelledby="connect-h">
+        <div class="panel-inner">
+          <h2 id="connect-h" class="center">Connect with me!</h2>
+          <div class="card" style="max-width: 780px; margin-inline: auto">
+            <div class="social-icons">
+              <a href="mailto:hyeonah.cho.au@gmail.com">
+                <img
+                  class="socials-icon"
+                  src="https://cdn.simpleicons.org/gmail/EA4335"
+                  alt="Email (Gmail Logo)"
+                />
+              </a>
+              <a href="https://github.com/Hyeonahyeah/">
+                <img
+                  class="socials-icon"
+                  src="https://cdn.simpleicons.org/github/ffffff"
+                  alt="GitHub Logo"
+                />
+              </a>
+              <a href="https://www.linkedin.com/in/hyeonah-cho-b0158a288/">
+                <img
+                  class="socials-icon linkedin"
+                  src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg"
+                  alt="LinkedIn Logo"
+                />
+              </a>
+              <a
+                href="https://open.spotify.com/user/315ppu4kpfcl4xg2em3egoiugcpe?si=d45161aaa8f4414e"
+              >
+                <img
+                  class="socials-icon"
+                  src="https://cdn.simpleicons.org/spotify/1DB954"
+                  alt="Spotify Logo"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // --------------------------
+      // Typing effect (Automation: keywords rotate without external lib)
+      // --------------------------
+      const words = [
+        "Here's what I'm about:",
+        "Efficiency",
+        "Persistence",
+        "Reliability",
+        "Collaboration",
+        "Eye for Detail",
+        "Logic",
+        "Analysis",
+      ];
+      const typedEl = document.getElementById("typed");
+
+      let wi = 0; // word index
+      let ci = 0; // char index
+      let deleting = false;
+
+      function typeLoop() {
+        const word = words[wi];
+        typedEl.textContent = word.slice(0, ci);
+
+        // Typing speed
+        let nextDelay = deleting ? 40 : 80;
+
+        // End of typing: pause, then start deleting
+        if (!deleting && ci >= word.length) {
+          deleting = true;
+          nextDelay = 900; // pause at end
+        }
+        // End of deleting: pause, then next word
+        else if (deleting && ci <= 0) {
+          deleting = false;
+          wi = (wi + 1) % words.length;
+          nextDelay = 300; // pause before next word
+        }
+
+        // Index update
+        ci += deleting ? -1 : 1;
+
+        setTimeout(typeLoop, nextDelay);
+      }
+
+      typeLoop();
+
+      // // --------------------------
+      // // Random "Ask me a question" prompt (Automation: lightweight interactivity)
+      // // --------------------------
+      // const prompts = [
+      //   "What’s a tiny automation that saved your team hours? ",
+      //   "When do you trade perfection for delivery?",
+      //   "How do you make interfaces “obvious” without a manual?",
+      //   "What have you automated lately outside of coding?",
+      //   "What’s a debugging habit you’d teach juniors first?",
+      // ];
+      // document.getElementById("randomQ").addEventListener("click", (e) => {
+      //   const msg = prompts[Math.floor(Math.random() * prompts.length)];
+      //   alert(msg);
+      // });
+
+      // --------------------------
+      // Scroll-snap helper: add/remove .leaving for the quick fly-up
+      // --------------------------
+      const panels = [...document.querySelectorAll("section.panel")];
+      const dots = [...document.querySelectorAll(".dot")];
+      function setDotActive(index) {
+        dots.forEach((d, i) =>
+          d.setAttribute("aria-current", i === index ? "true" : "false")
+        );
+      }
+      let activeIndex = 0;
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
+              const newIndex = panels.indexOf(entry.target);
+              if (newIndex !== activeIndex) {
+                panels[activeIndex]?.classList.add("leaving");
+                setTimeout(
+                  () => panels[activeIndex]?.classList.remove("leaving"),
+                  420
+                );
+                activeIndex = newIndex;
+                setDotActive(activeIndex);
+              }
+            }
+          });
+        },
+        { threshold: [0.7] }
+      );
+      panels.forEach((p) => io.observe(p));
+
+      // Dot navigation click → snap to section
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const sel = dot.getAttribute("data-target");
+          document.querySelector(sel)?.scrollIntoView({ behavior: "smooth" });
+        });
+      });
+
+      // --------------------------
+      // 👈 햄버거 토글 + 메뉴 이동
+      // --------------------------
+      const hamburger = document.querySelector(".hamburger");
+      const mobileMenu = document.querySelector(".mobile-menu");
+
+      hamburger.addEventListener("click", () => {
+        mobileMenu.classList.toggle("show");
+      });
+
+      // 👈 모바일 메뉴 클릭 시 스무스 스크롤
+      document.querySelectorAll(".mobile-menu a").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const sel = link.getAttribute("data-target");
+          document.querySelector(sel)?.scrollIntoView({ behavior: "smooth" });
+          mobileMenu.classList.remove("show");
+        });
+      });
+
+      // --------------------------
+      // Automation chat bubble assistant
+      // --------------------------
+      const automationFlow = document.getElementById("automationFlow");
+      const introBubble = document.getElementById("introBubble");
+
+      if (automationFlow && introBubble) {
+        let visitorName = "";
+        let automationIdea = "";
+        let minutesSaved = 0;
+        let frequencySaved = "day";
+        let extraTimePlan = "";
+
+        introBubble.addEventListener("click", () => {
+          if (introBubble.dataset.started === "true") return;
+          introBubble.dataset.started = "true";
+          document.querySelector(".hero-chat").classList.add("expanded"); // expand on interaction
+          introBubble.classList.remove("bubble-shake");
+          introBubble.classList.add("bubble-quiet");
+          introBubble.textContent =
+            "Let's explore an automation idea together! 🚀";
+          introBubble.setAttribute("disabled", "true");
+          showTextBubble("👋 Hi! I'm Hyeonah. What's your name?");
+          renderNameForm();
+        });
+
+        function createBubble(extraClass = "") {
+          const bubble = document.createElement("div");
+          bubble.className = `bubble ${extraClass}`.trim();
+          automationFlow.appendChild(bubble);
+          requestAnimationFrame(() => bubble.classList.add("bubble-enter"));
+          setTimeout(() => {
+            bubble.scrollIntoView({ behavior: "smooth", block: "end" });
+          }, 60);
+          return bubble;
+        }
+
+        function showTextBubble(message, options = {}) {
+          const bubble = createBubble(options.quiet ? "bubble-quiet" : "");
+          bubble.textContent = message;
+          bubble.style.whiteSpace = "pre-line";
+          return bubble;
+        }
+
+        function renderNameForm() {
+          const bubble = createBubble();
+          const form = document.createElement("form");
+          form.className = "chat-form";
+          form.innerHTML = `
+            <!-- <p class="chat-question">What's your name?</p> -->
+            <label class="visually-hidden" for="visitorName">Your name</label>
+            <input id="visitorName" name="visitorName" class="inline-input" type="text" autocomplete="name" placeholder="e.g. Amy" required />
+            <button type="submit" class="chat-submit">Next</button>
+          `;
+          bubble.append(form);
+
+          const input = form.querySelector("#visitorName");
+          setTimeout(() => input.focus(), 260);
+
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const value = input.value.trim();
+            if (!value) {
+              input.focus();
+              input.setAttribute("aria-invalid", "true");
+              return;
+            }
+            input.removeAttribute("aria-invalid");
+            visitorName = value;
+            bubble.innerHTML = `<p class="chat-question">Hi, I'm ${visitorName}.</p>`;
+            bubble.classList.add("bubble-quiet");
+            showTextBubble(
+              `Great to meet you, ${visitorName}!\nIf you could, what would you automate in your daily life?`
+            );
+            renderAutomationForm();
+          });
+        }
+
+        function renderAutomationForm() {
+          const bubble = createBubble();
+          const form = document.createElement("form");
+          form.className = "chat-form";
+          form.innerHTML = `
+            <!-- <p class="chat-question">What would you automate in your daily life?</p> -->
+            <p class="chat-template">
+              I would like to automate
+              <input id="automationFocus" name="automationFocus" class="inline-input" type="text" placeholder="my email triage" required />
+              then I will be able to save
+              <input id="minutesSaved" name="minutesSaved" class="inline-number" type="number" min="1" step="1" placeholder="15" required />
+              minutes per
+              <select id="frequency" name="frequency" class="inline-select">
+                <option value="day">day</option>
+                <option value="week">week</option>
+                <option value="month">month</option>
+              </select>.
+            </p>
+            <button type="submit" class="chat-submit">Calculate</button>
+          `;
+          bubble.append(form);
+
+          const ideaInput = form.querySelector("#automationFocus");
+          const minutesInput = form.querySelector("#minutesSaved");
+          const frequencySelect = form.querySelector("#frequency");
+          setTimeout(() => ideaInput.focus(), 260);
+
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const ideaValue = ideaInput.value.trim();
+            const minutesValue = Number(minutesInput.value);
+            if (!ideaValue) {
+              ideaInput.focus();
+              ideaInput.setAttribute("aria-invalid", "true");
+              return;
+            }
+            ideaInput.removeAttribute("aria-invalid");
+            if (!Number.isFinite(minutesValue) || minutesValue <= 0) {
+              minutesInput.focus();
+              minutesInput.setAttribute("aria-invalid", "true");
+              return;
+            }
+            minutesInput.removeAttribute("aria-invalid");
+
+            automationIdea = ideaValue;
+            minutesSaved = minutesValue;
+            frequencySaved = frequencySelect.value;
+
+            bubble.innerHTML = `<p class="chat-template">I would like to automate ${automationIdea} then I will be able to save ${minutesSaved} minutes per ${frequencySaved}.</p>`;
+            bubble.classList.add("bubble-quiet");
+
+            const yearlyMinutes =
+              minutesSaved *
+              (frequencySaved === "day"
+                ? 365
+                : frequencySaved === "week"
+                ? 52
+                : 12);
+            const yearlyHours = yearlyMinutes / 60;
+            const decimals = yearlyHours >= 10 ? 0 : 1;
+            const formattedHours = yearlyHours.toLocaleString(undefined, {
+              minimumFractionDigits: decimals,
+              maximumFractionDigits: decimals,
+            });
+
+            showTextBubble(
+              `That unlocks about ${formattedHours} hours every year! 🤯\n With that extra time, what would you like to do instead?`
+            );
+            renderExtraTimeForm();
+          });
+        }
+
+        function renderExtraTimeForm() {
+          const bubble = createBubble();
+          const form = document.createElement("form");
+          form.className = "chat-form";
+          form.innerHTML = `
+            <!-- <p class="chat-question">With that extra time, what would you like to do instead?</p> -->
+            <p class="chat-template">
+              With the extra time I'd like to
+              <input id="extraPlan" name="extraPlan" class="inline-input" type="text" placeholder="learn motion design" required />.
+            </p>
+            <button type="submit" class="chat-submit">Finish</button>
+          `;
+          bubble.append(form);
+
+          const planInput = form.querySelector("#extraPlan");
+          setTimeout(() => planInput.focus(), 260);
+
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const planValue = planInput.value.trim();
+            if (!planValue) {
+              planInput.focus();
+              planInput.setAttribute("aria-invalid", "true");
+              return;
+            }
+            planInput.removeAttribute("aria-invalid");
+            extraTimePlan = planValue;
+
+            bubble.innerHTML = `<p class="chat-template">With the extra time I'd like to ${extraTimePlan}.</p>`;
+            bubble.classList.add("bubble-quiet");
+
+            showTextBubble(
+              `Wow, that sounds awesome, ${visitorName}! Imagine consistently having time to ${extraTimePlan}. That could totally happen… if you bring me on board 😏`
+            );
+          });
+        }
+      }
+      // --------------------------
+      // About section slider (manual, with swipe support)
+      // --------------------------
+      function syncHeights() {
+        const about = document.querySelector(".about-card");
+        const quick = document.querySelector(".techstack");
+        if (!about || !quick) return;
+
+        about.style.minHeight = "auto";
+        quick.style.minHeight = "auto";
+
+        const maxHeight = Math.max(about.offsetHeight, quick.offsetHeight);
+        about.style.minHeight = maxHeight + "px";
+        quick.style.minHeight = maxHeight + "px";
+      }
+
+      window.addEventListener("load", syncHeights);
+      window.addEventListener("resize", syncHeights);
+      const slides = document.querySelectorAll(".about-slide");
+      let current = 0;
+
+      function showSlide(index) {
+        slides.forEach((slide, i) => {
+          slide.classList.toggle("active", i === index);
+        });
+      }
+
+      document.getElementById("prevAbout").addEventListener("click", () => {
+        current = (current - 1 + slides.length) % slides.length;
+        showSlide(current);
+      });
+
+      document.getElementById("nextAbout").addEventListener("click", () => {
+        current = (current + 1) % slides.length;
+        showSlide(current);
+      });
+      // ✅ 스와이프 모션 추가
+      const slider = document.querySelector(".about-slider");
+      let startX = 0;
+
+      slider.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+      });
+
+      slider.addEventListener("touchend", (e) => {
+        const dx = e.changedTouches[0].clientX - startX;
+        if (dx > 50) {
+          // 오른쪽으로 스와이프 → Prev
+          current = (current - 1 + slides.length) % slides.length;
+          showSlide(current);
+        }
+        if (dx < -50) {
+          // 왼쪽으로 스와이프 → Next
+          current = (current + 1) % slides.length;
+          showSlide(current);
+        }
+      });
+
+      // 초기화
+      showSlide(current);
+
+      // --------------------------
+      // Coming soon alert for unfinished links
+      // --------------------------
+      function showComingSoon(event) {
+        event.preventDefault();
+        alert("Project complete — GitHub repo will be published soon. 🚀");
+      }
+    </script>
   </body>
 </html>
