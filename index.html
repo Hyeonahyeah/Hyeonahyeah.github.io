@@ -370,7 +370,7 @@
       });
 
       // --------------------------
-      // 👈 햄버거 토글 + 메뉴 이동
+      // Hamburger & mobile menu
       // --------------------------
       const hamburger = document.querySelector(".hamburger");
       const mobileMenu = document.querySelector(".mobile-menu");
@@ -379,7 +379,7 @@
         mobileMenu.classList.toggle("show");
       });
 
-      // 👈 모바일 메뉴 클릭 시 스무스 스크롤
+      // smooth scroll on mobile menu link click + close menu
       document.querySelectorAll(".mobile-menu a").forEach((link) => {
         link.addEventListener("click", (e) => {
           e.preventDefault();
@@ -613,7 +613,7 @@
         current = (current + 1) % slides.length;
         showSlide(current);
       });
-      // ✅ 스와이프 모션 추가
+      // Swipe support
       const slider = document.querySelector(".about-slider");
       let startX = 0;
 
@@ -624,18 +624,18 @@
       slider.addEventListener("touchend", (e) => {
         const dx = e.changedTouches[0].clientX - startX;
         if (dx > 50) {
-          // 오른쪽으로 스와이프 → Prev
+          // Swipe right → Prev
           current = (current - 1 + slides.length) % slides.length;
           showSlide(current);
         }
         if (dx < -50) {
-          // 왼쪽으로 스와이프 → Next
+          // Swipe left → Next
           current = (current + 1) % slides.length;
           showSlide(current);
         }
       });
 
-      // 초기화
+      // Initial display
       showSlide(current);
 
       // --------------------------
