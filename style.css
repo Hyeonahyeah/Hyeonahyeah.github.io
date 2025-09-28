@@ -1,313 +1,612 @@
-/* Base HTML Styles */
-@import url("https://fonts.googleapis.com/css2?family=Inter&family=Rubik:ital,wght@0,400;0,700;1,400&display=swap");
+/* ------------------
+               Design tokens
+            ------------------ */
 
+/* 🚧 Auto/manual Light - Dark under development */
 :root {
-  --brand: #8246af;
-  --action: #ffa300;
-  --white: #ffffff;
-  --base-light: #cdb5df;
-  --base-dark: #0d0711;
-  --black: #111111;
+  --bg: #ffffff;
+  --text: #0b0f10;
+  --muted: #667085;
+  --brand: #2e7dff;
+  --brand-2: #00c2a8; /* accent for subtle highlights */
+  --card: #f5f7fb;
+  --ring: rgba(46, 125, 255, 0.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0f10;
+    --text: #f1f5f9;
+    --muted: #8b98a5;
+    --brand: #a590e8;
+    --brand-2: #e57373;
+    --card: #12171c;
+    --ring: rgba(106, 164, 255, 0.45);
+  }
+}
+[data-theme="dark"] {
+  --bg: #0b0f10;
+  --text: #f1f5f9;
+  --muted: #8b98a5;
+  --brand: #6aa4ff;
+  --brand-2: #32e2ca;
+  --card: #12171c;
+  --ring: rgba(106, 164, 255, 0.45);
 }
 
-/* CSS Reset */
-
-html {
+/* ------------------
+               Base styles
+            ------------------ */
+* {
   box-sizing: border-box;
-  font-size: 16px;
-  font-family: "Inter", sans-serif;
-  color: var(--black);
-  scroll-behavior: smooth;
 }
-
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
+html,
+body {
+  height: 100%;
 }
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Rubik", sans-serif;
-}
-
-body,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-ol,
-ul {
+body {
   margin: 0;
-  padding: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+    Noto Sans, "Apple SD Gothic Neo", "Pretendard", Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+  color: var(--text);
+  background: var(--bg);
 }
-
-ol,
-ul {
-  list-style: none;
+a {
+  color: var(--brand);
+  text-decoration: none;
 }
-
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
 img {
   max-width: 100%;
-  height: auto;
+  display: block;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 1px, 1px);
+  white-space: nowrap;
+  border: 0;
 }
 
-input,
-button,
-textarea,
-select {
-  font: inherit;
+/* ------------------
+               Layout: Scroll Snap
+            ------------------ */
+.snap-container {
+  height: 100vh; /* Full viewport */
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory; /* key line */
+  scroll-behavior: smooth;
+}
+section.panel {
+  position: relative;
+  min-height: 100vh; /* Each panel fills screen */
+  padding: clamp(20px, 4vw, 56px);
+  display: grid;
+  place-items: center;
+  scroll-snap-align: start; /* locks to top */
+  background: var(--bg);
+}
+.panel-inner {
+  width: min(1100px, 92vw);
+  display: grid;
+  gap: clamp(16px, 3vw, 28px);
+}
+.center {
+  text-align: center;
 }
 
-/* utility classes - a full stop needs to be added in front of the class name */
+/* Quick fly-up when leaving (the “슉!”) */
+@keyframes flyUp {
+  from {
+    filter: none;
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    filter: blur(4px);
+    transform: translateY(-14%);
+    opacity: 0.15;
+  }
+}
+.panel.leaving .panel-inner {
+  animation: flyUp 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
 
-.display-none {
+/* ------------------
+               Top utility bar
+            ------------------ */
+.topbar {
+  position: fixed;
+  inset: 12px 12px auto auto;
+  z-index: 50;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.btn {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none; /* 밑줄 제거 */
+  box-sizing: border-box; /* a와 button의 padding 계산 방식 통일 */
+  line-height: 1; /* 버튼과 동일하게 */
+  background: var(--card);
+  font-size: 0.9rem;
+  color: var(--text);
+  border: 1px solid color-mix(in oklab, var(--text) 18%, transparent);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+}
+.btn:hover {
+  filter: brightness(1.5);
+}
+.btn:active {
+  /* filter: brightness(0.7); */
+  transform: scale(0.96); /* 살짝 눌린 듯 */
+}
+.btn:focus {
+  filter: brightness(1.5);
+}
+
+/* ------------------
+               HERO
+            ------------------ */
+.hero {
+  display: grid;
+  gap: 24px;
+  align-items: center;
+  justify-items: center;
+  position: relative;
+}
+.avatar {
+  flex: 0 0 auto;
+  align-self: center;
+  width: clamp(120px, 40vw, 320px);
+  aspect-ratio: 1/1;
+  border-radius: 28px; /* soft rounded, not perfect circle to avoid “각진 네모” 느낌 */
+  object-fit: cover;
+  object-position: center 20%;
+  box-shadow: 0 10px 40px var(--brand);
+  background-color: var(--brand);
+}
+
+.headline {
+  font-size: clamp(28px, 7vw, 64px);
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+.kicker {
+  color: var(--muted);
+  font-size: clamp(12px, 2.6vw, 16px);
+  letter-spacing: 0.25px;
+  margin: 0;
+}
+.big-kw {
+  font-size: clamp(18px, 4.5vw, 28px);
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  min-height: 1.2em;
+  margin: 10px 0;
+}
+.cta-row {
+  display: flex;
+  gap: 14px;
+}
+.cta-primary {
+  background: var(--brand);
+  color: var(--bg);
+  border: none;
+}
+.cta-primary:hover {
+  filter: brightness(1.08);
+}
+
+/* ------------------
+               BIO / PROJECTS / CONTACT panels
+            ------------------ */
+.card {
+  background: var(--card);
+  border: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
+  padding: clamp(16px, 3.5vw, 28px);
+  border-radius: 18px;
+}
+
+/* Layout */
+
+.grid-2 {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr; /* 모바일: 1열 */
+  max-width: 1100px; /* 중앙에 모이도록 */
+  margin: 0 auto;
+}
+@media (min-width: 860px) {
+  .grid-2 {
+    grid-template-columns: 1.2fr 0.8fr; /* 데스크탑: 2열 */
+    align-items: start; /* Tech Stack가 About 섹션 타이틀에 맞춰 위로 */
+  }
+}
+
+/* Section Title */
+.section-title {
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.about-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card Title (소제목) */
+.card-title {
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* About 슬라이드 */
+.about-slide {
   display: none;
 }
-
-/* Components */
-
-/* btn-primary */
-.btn-primary {
-  padding: 12px 16px;
-  display: inline-block;
-  text-decoration: none;
-  color: var(--black);
-  border-radius: 4px;
-  background-color: var(--action);
-  transition: all 0.3s ease;
+.about-slide.active {
+  display: block;
 }
 
-.btn-primary:hover {
-  box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.2);
-  transform: translateY(-4px);
-}
-
-/* header */
-header .mobile-header {
-  padding: 16px;
+.about-nav {
+  margin-top: auto;
   display: flex;
-  align-items: center;
   justify-content: space-between;
 }
-
-header button {
-  all: unset;
+.about-nav button {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 2px solid var(--brand);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.about-nav button:hover {
+  /* background: #666; */
 }
 
-@media (min-width: 768px) {
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+/* Tech Stack */
+.techstack ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.techstack li {
+  margin: 6px 0;
+}
+.list-clean {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+.projects a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+}
+.projects a:hover {
+  filter: brightness(1.35);
+}
+.projects a:active {
+  transform: scale(0.98); /* 살짝 눌린 듯 */
+}
+/* Connect */
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 24px; /* 아이콘 사이 간격 */
+  flex-wrap: wrap;
+}
+.socials-icon {
+  width: 36px;
+  height: 36px;
+  filter: grayscale(1) brightness(0.8);
+  transition: filter 0.25s ease, transform 0.25s ease;
+  cursor: pointer;
+}
+.socials-icon.linkedin {
+  filter: invert(50%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%)
+    contrast(103%);
+}
+.socials-icon:hover {
+  filter: none; /* 원래 색상 복원 */
+  transform: scale(1.1); /* 살짝 확대 */
+}
+.socials-icon.linkedin:hover {
+  filter: invert(37%) sepia(91%) saturate(7472%) hue-rotate(186deg)
+    brightness(91%) contrast(101%);
+}
+/* ------------------
+            Dot nav (section nav)
+            ------------------ */
+.dots {
+  position: fixed;
+  right: 18px;
+  top: 50%;
+  translate: 0 -50%;
+  display: grid;
+  gap: 10px;
+  z-index: 40;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--text) 30%, transparent);
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+.dot[aria-current="true"] {
+  background: var(--brand);
+  border-color: color-mix(in oklab, var(--bg) 60%, transparent);
+}
+/* 👈 햄버거 버튼 기본 숨김 */
+.hamburger {
+  display: none;
+  padding: 6px 10px;
+}
+.hamburger svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--text); /* 선 색 */
+  stroke-width: 2; /* 선 굵기 */
+  display: block;
+}
+/* 👈 모바일 메뉴 */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  right: 16px;
+  background: var(--card);
+  border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+  border-radius: 12px;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  z-index: 70;
+}
+.mobile-menu.show {
+  display: flex;
+}
+.mobile-menu a {
+  color: var(--text);
+  text-decoration: none;
+}
+.mobile-menu a:hover {
+  color: var(--brand);
+}
 
-  header nav ul {
-    display: flex;
-    gap: 24px;
-    margin-right: 16px;
+/* 👈 미디어쿼리: 모바일일 때 dots 숨기고 햄버거 표시 */
+@media (max-width: 860px) {
+  .dots {
+    display: none;
   }
-
-  header .mobile-header .hamburger-icon {
+  .hamburger {
+    display: block;
+  }
+  .contact {
     display: none;
   }
 }
-
-/* .logo */
-.logo {
-  height: 50px;
+/* ------------------
+               Small helpers
+            ------------------ */
+.muted {
+  color: var(--muted);
 }
 
-@media (min-width: 768px) {
-  .logo {
-    height: 100px;
+/* ------------------
+               Chat bubble flow
+            ------------------ */
+/* .chat-shell {
+        margin-top: clamp(20px, 4vw, 40px);
+        padding: clamp(16px, 3vw, 24px);
+        border-radius: 20px;
+        background: var(--card);
+        border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+        box-shadow: 0 18px 40px color-mix(in oklab, var(--text) 6%, transparent);
+        display: grid;
+        gap: clamp(14px, 2.5vw, 22px);
+      } */
+
+/* place chat to the right of the centered avatar with an explicit gap */
+.hero-chat {
+  position: absolute;
+  top: 0;
+  left: 70%;
+  transform: none;
+  transition: width 0.35s ease;
+  box-sizing: border-box;
+}
+/* Desktop */
+@media (min-width: 861px) {
+  .hero-chat {
+    width: 130px; /* smaller bubble to start with */
+  }
+  .hero-chat.expanded {
+    width: clamp(260px, 28vw, 470px); /* expand on interaction */
   }
 }
 
-/* .mobile-nav */
-.mobile-nav a {
-  text-decoration: none;
-  color: var(--black);
-  display: block;
-  padding: 4px 16px;
-}
-
-/* .desktop-nav */
-.desktop-nav {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .desktop-nav a {
-    text-decoration: none;
-    font-size: larger;
-    color: var(--black);
+/* Mobile */
+@media (max-width: 860px) {
+  .hero-chat {
+    position: static;
+    width: 100%; /* full width of desktop*/
+    transform: none;
+    left: auto;
+    margin-top: clamp(20px, 4vw, 40px);
   }
-
-  .desktop-nav {
-    display: inline-block;
+  .hero-chat.expanded {
+    width: 100%;
   }
 }
-
-/* .hamburger-icon  */
-.hamburger-icon {
-  height: 50px;
-}
-
-/* .hero */
-.hero {
-  background-color: var(--brand);
-  padding: 56px 16px;
-  border-radius: 10px;
-  margin: 5px 10px;
-}
-
-/* Using rem for font-size is more stable than px */
-.hero h1 {
-  font-size: 2rem;
-  margin-bottom: 24px;
-  color: var(--white);
-}
-
-.hero .hero-accent {
-  color: var(--action);
-}
-
-@media (min-width: 768px) {
-  .hero {
-    padding: 120px 56px;
-  }
-
-  .hero h1 {
-    font-size: 3.5rem;
-    max-width: 70%;
-  }
-}
-
-/* .articles-container  */
-@media (min-width: 768px) {
-  .articles-container {
-    display: flex;
-  }
-}
-
-article {
-  padding: 32px 16px;
-  background-color: var(--base-light);
-  border-radius: 10px;
-  margin: 5px 10px;
-  transition: all 0.3s ease;
-}
-
-@media (min-width: 768px) {
-  article {
-    padding: 56px;
-  }
-}
-
-article:hover {
-  filter: contrast(150%);
-}
-
-/* class article-heading doesn't exist in HTML? */
-article .article-heading {
-  display: flex;
-  justify-content: flex-start;
-}
-
-article .icon {
-  height: 24px;
-  width: 24px;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-article .article-heading h2 {
-  margin-bottom: 16px;
-  color: var(--base-dark);
-}
-
-article p {
-  margin-bottom: 16px;
-}
-
-/* .contact-form */
-.contact-form {
-  padding: 48px 16px;
-  border-radius: 10px;
-  margin: 5px 10px;
-}
-
-.contact-form input,
-.contact-form select {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 16px;
-}
-
-.contact-form textarea {
-  display: block;
-  width: 100%;
-  padding: 8px;
-}
-
-.contact-form label {
-  display: block;
-  width: 100%;
-}
-
-.contact-form h2 {
-  color: var(--base-dark);
-  margin-bottom: 16px;
-}
-
-.contact-form input[type="submit"] {
-  background-color: var(--action);
-  border: 0;
-  margin-top: 8px;
-  cursor: pointer;
-}
-
-@media (min-width: 768px) {
-  .contact-form h2 {
-    text-align: center;
-    font-size: 2.5rem;
-  }
-
-  .contact-form form {
-    max-width: 60%;
-    margin: 40px auto;
-  }
-}
-
-/* footer */
-footer {
-  padding: 16px;
+.chat-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: clamp(18px, 3.6vw, 24px);
   text-align: center;
+}
+.chat-flow {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  gap: 14px;
+}
+.bubble {
+  position: relative;
+  background: var(--bg);
+  color: inherit;
+  border-radius: 18px;
+  padding: 14px 18px;
+  max-width: 580px;
+  border: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
+  box-shadow: 0 12px 32px color-mix(in oklab, var(--text) 8%, transparent);
+  transition: transform 240ms ease, opacity 240ms ease, box-shadow 240ms ease;
+  opacity: 0;
+  transform: translateY(10px);
+  line-height: 1.3;
+}
+/* 공통 꼬리 스타일 */
+.chat-flow .bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  width: 16px;
+  height: 16px;
+  background: inherit;
+  border-bottom: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
+  transform: rotate(45deg);
 }
 
-.socials-icon {
-  width: 40px;
-  height: 40px;
+/* 홀수번째 꼬리 → 왼쪽 */
+.chat-flow .bubble:nth-child(odd)::after {
+  right: 24px;
+  left: auto;
 }
 
-@media (min-width: 768px) {
-  footer {
-    justify-content: center;
+/* 짝수번째 꼬리 → 오른쪽 */
+.chat-flow .bubble:nth-child(even)::after {
+  left: 24px;
+  right: auto;
+}
+.bubble-enter {
+  opacity: 1;
+  transform: translateY(0);
+}
+.bubble button,
+.bubble input,
+.bubble select,
+.bubble textarea {
+  font: inherit;
+  color: inherit;
+}
+.bubble.bubble-action {
+  cursor: pointer;
+  text-align: left;
+}
+.bubble.bubble-action:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 4px;
+}
+.bubble-shake {
+  animation: bubbleShake 800ms ease-in-out infinite;
+}
+@keyframes bubbleShake {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0.3deg);
   }
-
-  footer .socials-icon {
-    margin-left: 20px;
-    margin-right: 20px;
+  20% {
+    transform: translateY(-1px) rotate(-1deg);
   }
+  40% {
+    transform: translateY(1px) rotate(1deg);
+  }
+  60% {
+    transform: translateY(-1px) rotate(-0.6deg);
+  }
+  80% {
+    transform: translateY(1px) rotate(0.6deg);
+  }
+}
+.chat-form {
+  display: grid;
+  gap: 12px;
+}
+.chat-question {
+  margin: 0;
+  font-weight: 600;
+}
+.chat-template {
+  line-height: 1.3;
+}
+.inline-input,
+.inline-number,
+.inline-select {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  line-height: 1.2;
+  vertical-align: middle;
+  border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--bg) 88%, white 12%);
+}
+.inline-number {
+  width: 90px;
+}
+.inline-select {
+  margin-left: 6px;
+}
+.chat-submit {
+  justify-self: end;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: filter 160ms ease;
+  line-height: 1.3;
+}
+.chat-submit:hover {
+  filter: brightness(1.08);
+}
+.chat-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.bubble-quiet {
+  background: color-mix(in oklab, var(--card) 80%, var(--bg) 20%);
+}
+.bubble-quiet::after {
+  background: inherit;
 }
