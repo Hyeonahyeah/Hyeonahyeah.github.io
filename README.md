@@ -104,8 +104,12 @@ During development I had additional ideas and features I wanted to implement, bu
 - Connect Section  
   ![Projects section on desktop](./screenshots/connect_mobile.png)
 
-#### States & Features (Video)
+#### Demo Videos
 
 - Hover, Active & Features
+https://github.com/user-attachments/assets/1f20ebc0-ed2e-4967-b598-a522ece830cb
 
 - Focus State
+https://github.com/user-attachments/assets/e1120ff7-0e1f-4237-8fdb-0237f97d653b
+
+
